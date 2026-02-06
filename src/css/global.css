@@ -1,24 +1,24 @@
 @layer base, apply, custom, theme, mui, components, utilities;
-@font-face{
-  src: url('../assets/fonts/SNPro-Bold.ttf') format('truetype');
-  font-family: 'bold';
+@font-face {
+  src: url("../assets/fonts/SNPro-Bold.ttf") format("truetype");
+  font-family: "bold";
   font-weight: 800;
 }
-@font-face{
-  src: url('../assets/fonts/SNPro-Medium.ttf') format('truetype');
-  font-family: 'medium';
+@font-face {
+  src: url("../assets/fonts/SNPro-Medium.ttf") format("truetype");
+  font-family: "medium";
   font-weight: 600;
 }
-@font-face{
-  src: url('../assets/fonts/SNPro-Regular.ttf') format('truetype');
-  font-family: 'regular';
+@font-face {
+  src: url("../assets/fonts/SNPro-Regular.ttf") format("truetype");
+  font-family: "regular";
   font-weight: 400;
 }
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@theme{
-  --color-primary: #928DAB;
+@theme {
+  --color-primary: #928dab;
   --color-secondary: #1f1c2c;
   --font-regular: "regular";
   --font-bold: "bold";
@@ -26,14 +26,14 @@
 }
 
 @base {
-  *{
-    transition: all .2s ease-in-out;
+  * {
+    transition: all 0.2s ease-in-out;
     scroll-behavior: smooth;
   }
 }
 
 @custom {
-  body{
-    @apply font-regular;
+  body {
+    @apply font-regular bg-slate-800;
   }
 }
