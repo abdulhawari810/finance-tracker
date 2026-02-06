@@ -1,0 +1,24 @@
+@font-face{
+  src: url('../assets/fonts/SNPro-Bold.ttf').format('truetype');
+  font-family: 'bold';
+}
+@font-face{
+  src: url('../assets/fonts/SNPro-Medium.ttf').format('truetype');
+  font-family: 'medium';
+}
+@font-face{
+  src: url('../assets/fonts/SNPro-Regular.ttf').format('truetype');
+  font-family: 'regular';
+}
+
+:root{
+  --color-primary: #928DAB;
+  --color-secondary: #1f1c2c;
+}
+
+body{
+  font-family: regular;
+  font-size: 16px;
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
