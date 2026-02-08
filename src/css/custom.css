@@ -1,24 +1,60 @@
-@font-face{
-  src: url('../assets/fonts/SNPro-Bold.ttf').format('truetype');
-  font-family: 'bold';
-}
-@font-face{
-  src: url('../assets/fonts/SNPro-Medium.ttf').format('truetype');
-  font-family: 'medium';
-}
-@font-face{
-  src: url('../assets/fonts/SNPro-Regular.ttf').format('truetype');
-  font-family: 'regular';
-}
-
-:root{
-  --color-primary: #928DAB;
+:root {
+  --color-primary: #928dab;
   --color-secondary: #1f1c2c;
 }
 
-body{
-  font-family: regular;
-  font-size: 16px;
-  padding-top: 80px;
-  padding-bottom: 80px;
+body.no-scroll {
+  overflow: hidden;
+}
+
+.key {
+  padding: 20px;
+  font-size: 20px;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+
+.key:active {
+  transform: scale(0.9);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) inset;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.modal-in {
+  animation: ModalIn 0.2s forwards;
+}
+.modal-out {
+  animation: ModalOut 0.2s forwards;
+}
+
+@keyframes ModalIn {
+  0% {
+    transform: translateX(500px);
+  }
+  50% {
+    transform: translateX(200px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+@keyframes ModalOut {
+  0% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(200px);
+  }
+  100% {
+    transform: translateX(500px);
+  }
 }

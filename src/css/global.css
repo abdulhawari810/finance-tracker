@@ -7,7 +7,7 @@
 @font-face {
   src: url("../assets/fonts/SNPro-Medium.ttf") format("truetype");
   font-family: "medium";
-  font-weight: 600;
+  font-weight: 900;
 }
 @font-face {
   src: url("../assets/fonts/SNPro-Regular.ttf") format("truetype");
@@ -25,15 +25,11 @@
   --font-medium: "medium";
 }
 
-@base {
-  * {
-    transition: all 0.2s ease-in-out;
-    scroll-behavior: smooth;
-  }
+* {
+  transition: all 0.2s ease-in-out;
+  scroll-behavior: smooth;
 }
 
-@custom {
-  body {
-    @apply font-regular bg-slate-800;
-  }
+body {
+  @apply font-regular bg-slate-800 text-[16px];
 }

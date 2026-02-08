@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@mui/material";
@@ -9,10 +9,14 @@ import "./css/custom.css";
 import "./css/global.css";
 
 import App from "./components/layout/app.jsx";
-import Home from "./pages/Home.jsx";
+import SettingLayout from "./components/layout/setting.jsx";
 import Transaksi from "./pages/Transaksi.jsx";
 import Laporan from "./pages/Laporan.jsx";
 import Pengaturan from "./pages/Pengaturan.jsx";
+import Rekening from "./pages/Rekening.jsx";
+import Profile from "./pages/Profile.jsx";
+
+const Home = lazy(() => import("./pages/Home"));
 
 const router = createBrowserRouter([
   {
@@ -31,11 +35,21 @@ const router = createBrowserRouter([
         path: "/Laporan",
         element: <Laporan />,
       },
+    ],
+  },
+  {
+    path: "/Pengaturan",
+    element: <SettingLayout />,
+    children: [
       {
         path: "/Pengaturan",
         element: <Pengaturan />,
       },
     ],
+  },
+  {
+    path: "/Rekening",
+    element: <Rekening />,
   },
 ]);
 
