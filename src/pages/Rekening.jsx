@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import toast from "react-hot-toast";
 
@@ -15,6 +16,7 @@ import Button from "@mui/material/Button";
 
 import KeyboardBackspaceRoundedIcon from "@mui/icons-material/KeyboardBackspaceRounded";
 import AddCardRoundedIcon from "@mui/icons-material/AddCardRounded";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -27,7 +29,10 @@ import { getImagesBank } from "../utils/imageLoader";
 import Navbar from "../components/navbar";
 
 export default function Rekening() {
-  const data = JSON.parse(localStorage.getItem("rekening"));
+  const nav = useNavigate();
+  const [data, setData] = useState(
+    JSON.parse(localStorage.getItem("rekening")),
+  );
   const [form, setForm] = useState({
     fullname: "",
     cardNumber: 0,
@@ -59,7 +64,12 @@ export default function Rekening() {
 
     const existingData = JSON.parse(localStorage.getItem("rekening")) || [];
 
-    const addData = [...existingData, form];
+    const newData = {
+      id: Date.now(),
+      ...form,
+    };
+
+    const addData = [...existingData, newData];
 
     localStorage.setItem("rekening", JSON.stringify(addData));
     setForm({
@@ -71,6 +81,17 @@ export default function Rekening() {
       isDefault: false,
     });
     toast.success("Rekening Berhasil Ditambahkan!");
+    setData(addData);
+  };
+
+  const handleDelete = (id) => {
+    const existingData = JSON.parse(localStorage.getItem("rekening")) || [];
+
+    const filtered = existingData.filter((item) => item.id != id);
+
+    localStorage.setItem("rekening", JSON.stringify(filtered));
+    toast.success("Rekening Berhasil Dihapus!");
+    setData(filtered);
   };
 
   const providerOptions = {
@@ -94,15 +115,9 @@ export default function Rekening() {
     ],
   };
   return (
-    <main className="relative pb-[50px] w-full z-500 overflow-y-scroll bg-slate-400 ">
+    <main className="relative pb-12.5 w-full z-500 overflow-y-scroll h-screen bg-slate-400 ">
       <header className="sticky top-0 text-white left-0 z-500 mb-10 p-5 w-full h-20 bg-secondary flex items-center justify-center">
-        <button
-          className=" absolute left-5"
-          onClick={() => {
-            setModalOpen(false);
-            setModalType("");
-          }}
-        >
+        <button className=" absolute left-5" onClick={() => nav(-1)}>
           <KeyboardBackspaceRoundedIcon className="text-3xl!" />
         </button>
         <h2 className="font-bold text-lg">Atur Rekening</h2>
@@ -317,6 +332,13 @@ export default function Rekening() {
                       label="Jadikan sebagai default"
                     />
                   </FormGroup>
+                  <Button
+                    className="flex items-center bg-red-500/10! capitalize! text-red-500! p-2.5!"
+                    onClick={() => handleDelete(rek.id)}
+                  >
+                    <DeleteRoundedIcon />
+                    <span>Hapus</span>
+                  </Button>
                 </AccordionDetails>
               </Accordion>
             );

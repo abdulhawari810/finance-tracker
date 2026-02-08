@@ -41,7 +41,7 @@ export default function Pengaturan() {
         {/* <ArrowForwardIosRoundedIcon className="text-xl!" /> */}
       </section>
       <h1 className="my-8 font-bold text-lg">Pengaturan Lainnya</h1>
-      <section className="flex flex-col w-full bg-slate-700 divide-y rounded-xl divide-primary/40">
+      <section className="flex flex-col w-full bg-slate-700 divide-y rounded-xl divide-red-500/40">
         <Button
           className="flex! items-center! justify-between! w-full! text-white! normal-case! p-5!"
           onClick={() => nav("/Rekening")}
