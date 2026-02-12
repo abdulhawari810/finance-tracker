@@ -10,6 +10,11 @@ import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import KeyboardBackspaceRoundedIcon from "@mui/icons-material/KeyboardBackspaceRounded";
 import { useEffect, useState } from "react";
 
+import Radio from "@mui/material/Radio";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormLabel from "@mui/material/FormLabel";
+
 import { BarChart } from "@mui/x-charts/BarChart";
 import Box from "@mui/material/Box";
 import MenuItem from "@mui/material/MenuItem";
@@ -20,14 +25,77 @@ import Modal from "../components/modal";
 import InputField from "../components/InputField";
 import Numpad from "../components/Numpad";
 
-import { getImagesWallet } from "../utils/imageLoader";
+import { ProviderIcons } from "../utils/providerIcons";
+import { rupiah } from "../utils/rupiah";
+import Button from "@mui/material/Button";
+import toast from "react-hot-toast";
 
 export default function Home() {
   const [age, setAge] = useState(2026);
   const [visible, setVisible] = useState(false);
   const [ModalOpen, setModalOpen] = useState(false);
   const [ModalType, setModalType] = useState("");
+  const [SubModalOpen, setSubModalOpen] = useState(false);
+  const [SubModalType, setSubModalType] = useState("");
   const [number, setNumber] = useState("");
+  const [rekening, setRekening] = useState(
+    JSON.parse(localStorage.getItem("rekening")) || [],
+  );
+  const [topup, setTopup] = useState(
+    JSON.parse(localStorage.getItem("rekening"))?.find(
+      (item) => item.isDefault,
+    ) || [],
+  );
+  const [saldo, setSaldo] = useState(
+    rekening.reduce((acc, item) => acc + item.balance, 0),
+  );
+
+  console.log(saldo);
+
+  const handleChangeDefault = (id) => {
+    setTopup(null);
+    const existing = JSON.parse(localStorage.getItem("rekening")) || [];
+
+    const updateData = existing.map((item) => ({
+      ...item,
+      isDefault: item.id === id,
+    }));
+
+    const topupData = updateData?.find((item) => item.isDefault === true);
+
+    localStorage.setItem("rekening", JSON.stringify(updateData));
+    setRekening(updateData);
+    setTopup(topupData);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const existing = JSON.parse(localStorage.getItem("rekening")) || [];
+    if (number === 0) return toast.error("Masukkan jumlah saldo!");
+
+    if (existing?.length === 0)
+      return toast.error("Tambah rekening terlebih dahulu!");
+
+    const updateData = existing.map((item) => {
+      if (item.id === topup.id) {
+        return {
+          ...item,
+          balance: Number(item.balance) + Number(number),
+        };
+      }
+      return item;
+    });
+
+    const rek = localStorage.setItem("rekening", JSON.stringify(updateData));
+    setRekening(updateData);
+    setSaldo(updateData.reduce((acc, item) => acc + item.balance, 0));
+
+    toast.success("Topup Saldo Berhasil!");
+    setModalOpen(false);
+    setModalType("");
+    setNumber("");
+  };
 
   useEffect(() => {
     if (!ModalOpen) return;
@@ -42,9 +110,11 @@ export default function Home() {
       document.body.classList.remove("no-scroll");
     };
   }, [ModalOpen]);
+
   const handleChange = (event) => {
     setAge(event.target.value);
   };
+
   return (
     <>
       <main className="w-full p-5 flex bg-slate-400 flex-col">
@@ -55,14 +125,13 @@ export default function Home() {
               <h1 className="text-lg text-secondary font-medium">Saldo</h1>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-secondary text-xl font-medium">Rp</span>
               {visible ? (
                 <span className="text-secondary text-2xl font-bold">
-                  5.000.000
+                  {rupiah(saldo)}
                 </span>
               ) : (
                 <span className="text-secondary text-2xl font-bold">
-                  *********
+                  Rp *********
                 </span>
               )}
               <VisibilityRoundedIcon
@@ -162,7 +231,7 @@ export default function Home() {
                   color: ["green", "orange"],
                 },
               ]}
-              series={[{ data: [2, 5, 6, 5, 2, 5, 6, 5, 2, 5, 6, 5, 5] }]}
+              series={[{ data: [2, 5, 6, 5, 2, 5, 6, 5, 2, 5, 6, 5] }]}
               height={200}
               yAxis={[
                 {
@@ -220,7 +289,7 @@ export default function Home() {
                   ],
                 },
               ]}
-              series={[{ data: [2, 5, 6, 5, 2, 5, 6, 5, 2, 5, 6, 5, 5] }]}
+              series={[{ data: [2, 5, 6, 5, 2, 5, 6, 5, 2, 5, 6, 5] }]}
               height={200}
               yAxis={[
                 {
@@ -238,63 +307,121 @@ export default function Home() {
         </section>
       </main>
 
-      {ModalOpen && ModalType === "topup" && (
-        <Modal
-          styles={
-            "flex items-center justify-center fixed top-0 left-0 z-50 w-full h-screen"
-          }
+      <Modal
+        styles={`flex items-center justify-center 
+         fixed top-0 left-0 z-50 w-full ${ModalOpen && ModalType === "topup" ? "animation-menu-in scale-100" : "scale-0 animation-menu-out"} `}
+      >
+        <form
+          className="flex flex-col w-full pb-10 overflow-y-scroll h-screen bg-slate-200"
+          onSubmit={handleSubmit}
         >
-          <form className="flex flex-col w-full h-full bg-slate-200">
-            <header className="flex items-center justify-center relative bg-secondary text-slate-100  p-5">
-              <KeyboardBackspaceRoundedIcon
-                className="absolute text-3xl! left-5"
-                onClick={() => {
-                  setModalOpen(false);
-                  setModalType("");
-                }}
-              />
-              <h1 className="font-bold text-lg">Topup Saldo</h1>
-            </header>
+          <header className="flex items-center sticky top-0 left-0 z-50 justify-center  bg-secondary text-slate-100  p-5">
+            <KeyboardBackspaceRoundedIcon
+              className="absolute text-3xl! left-5"
+              onClick={() => {
+                setModalOpen(false);
+                setModalType("");
+                setSubModalOpen(false);
+                setSubModalType("");
+              }}
+            />
+            <h1 className="font-bold text-lg">Topup Saldo</h1>
+          </header>
+          {topup?.length !== 0 && (
             <div className="flex bg-slate-100 w-full items-center p-5 justify-between">
               <div className="flex items-center gap-2.5">
                 <img
-                  src={getImagesWallet("dana-ewallet.webp")}
+                  src={ProviderIcons[topup.provider]}
                   alt="Dana E-Wallet"
                   className="object-contain w-12 h-12 rounded-full"
                 />
                 <div className="flex flex-col">
-                  <h4 className="font-bold">Dana</h4>
-                  <span>083899513983</span>
+                  <h4 className="font-bold">{topup.label}</h4>
+                  <h4 className="font-medium text-sm">{topup.fullname}</h4>
+                  <span className="font-medium text-sm">
+                    {topup.cardNumber}
+                  </span>
                 </div>
               </div>
-              <span>ganti</span>
+              <Button
+                className={`capitalize! text-md! p-2.5! rounded-lg!  font-medium!   ${SubModalOpen && SubModalType === "change" ? "bg-secondary! text-white!" : "bg-slate-100! text-slate-600!"} `}
+                onClick={() => {
+                  setSubModalOpen(!SubModalOpen);
+                  setSubModalType("change");
+                }}
+              >
+                Ganti
+              </Button>
             </div>
-            <section className="w-full flex-col flex items-center">
-              <div className="relative w-full">
-                <label
-                  htmlFor="input-number"
-                  className="absolute font-bold text-3xl top-[50%] left-12.5 -translate-y-[50%]"
+          )}
+          <section className="w-full bg-red-500  flex-col flex items-center">
+            <div className="relative w-full">
+              <label
+                htmlFor="input-number"
+                className="absolute font-bold text-3xl top-[50%] left-12.5 -translate-y-[50%]"
+              >
+                Rp
+              </label>
+              <InputField
+                id={"input-number"}
+                styles={
+                  "bg-slate-200 w-full h-[150px] border-none outline-none flex pl-[100px] pr-[30px] font-bold text-3xl"
+                }
+                value={number}
+              />
+            </div>
+            <Numpad
+              value={number}
+              onChange={(va) => {
+                setNumber(va);
+                setSubModalOpen(false);
+                setSubModalType("");
+              }}
+            />
+          </section>
+          <div className="flex items-center justify-center w-full px-5">
+            <button
+              className="w-full text-white font-bold text-lg rounded-full bg-secondary h-16"
+              type="submit"
+            >
+              Tambahkan Saldo
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        styles={`w-full z-500 px-10 fixed top-40 ${SubModalOpen && SubModalType === "change" ? "animaion-menu-in scale-100" : "animation-menu-out scale-0"}`}
+      >
+        <main className="w-full bg-white rounded-2xl p-5">
+          <FormControl className="gap-y-2! w-full">
+            <FormLabel id="demo-radio-buttons-group-label">
+              Pilih Alamat Rekening
+            </FormLabel>
+            {Array.isArray(rekening) &&
+              rekening.map((rek, i) => (
+                <FormGroup
+                  key={rek.id}
+                  className=" flex! items-center! relative! flex-row! w-full!"
                 >
-                  Rp
-                </label>
-                <InputField
-                  id={"input-number"}
-                  styles={
-                    "bg-slate-200 w-full h-[200px] border-none outline-none flex pl-[100px] pr-[30px] font-bold text-3xl"
-                  }
-                  value={number}
-                />
-              </div>
-              <Numpad value={number} onChange={setNumber} />
-            </section>
-            <div className="flex items-center justify-center w-full px-5">
-              <button className="w-full text-white font-bold text-lg rounded-full bg-secondary h-16">
-                Tambahkan Saldo
-              </button>
-            </div>
-          </form>
-        </Modal>
-      )}
+                  <FormControlLabel
+                    value={rek.provider}
+                    control={<Radio checked={rek.isDefault} />}
+                    onChange={() => handleChangeDefault(rek.id)}
+                    label={rek.label}
+                    className="w-full! z-20"
+                  ></FormControlLabel>
+                  <span className="font-bold absolute top-0 left-20">
+                    {rek.fullname}
+                  </span>
+                  <span className="absolute left-20 top-0 translate-y-5">
+                    {rek.cardNumber}
+                  </span>
+                </FormGroup>
+              ))}
+          </FormControl>
+        </main>
+      </Modal>
     </>
   );
 }

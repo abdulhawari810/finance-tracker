@@ -36,11 +36,63 @@ export default function Rekening() {
   const [form, setForm] = useState({
     fullname: "",
     cardNumber: 0,
+    balance: 0,
     type: "",
+    label: "",
     provider: "",
     isActive: true,
     isDefault: false,
   });
+  const providerOptions = {
+    bank: [
+      { value: "bri", label: "Bank BRI" },
+      { value: "bca", label: "Bank BCA" },
+      { value: "jago", label: "Bank Jago" },
+      { value: "jenius", label: "Bank Jenius" },
+      { value: "seabank", label: "Seabank" },
+      { value: "mandiri", label: "Bank Mandiri" },
+      { value: "neobank", label: "Neobank" },
+    ],
+    "e-wallet": [
+      { value: "dana", label: "Dana" },
+      { value: "ovo", label: "Ovo" },
+      { value: "gopay", label: "Gopay" },
+      { value: "shopeepay", label: "ShopeePay" },
+      { value: "linkaja", label: "LinkAja" },
+    ],
+    debit: [
+      { value: "visa", label: "Visa" },
+      { value: "master_card", label: "Master Card" },
+    ],
+  };
+
+  const handleChangeActive = (id) => {
+    const existing = JSON.parse(localStorage.getItem("rekening")) || [];
+
+    const updateData = existing.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            isActive: !item.isActive,
+          }
+        : item,
+    );
+
+    localStorage.setItem("rekening", JSON.stringify(updateData));
+    setData(updateData);
+  };
+
+  const handleChangeDefault = (id) => {
+    const existing = JSON.parse(localStorage.getItem("rekening")) || [];
+
+    const updateData = existing.map((item) => ({
+      ...item,
+      isDefault: item.id === id,
+    }));
+
+    localStorage.setItem("rekening", JSON.stringify(updateData));
+    setData(updateData);
+  };
 
   const handleChangeType = (event) => {
     const selectedType = event.target.value;
@@ -52,7 +104,16 @@ export default function Rekening() {
     }));
   };
   const handleChangeProvider = (event) => {
-    setForm({ ...form, provider: event.target.value });
+    const selectedValue = event.target.value;
+
+    const selectedProvider = providerOptions[form.type]?.find(
+      (item) => item.value === selectedValue,
+    );
+    setForm({
+      ...form,
+      provider: selectedValue,
+      label: selectedProvider?.label || "",
+    });
   };
 
   const handleSubmit = (e) => {
@@ -64,9 +125,27 @@ export default function Rekening() {
 
     const existingData = JSON.parse(localStorage.getItem("rekening")) || [];
 
+    const isDefault = existingData?.length === 0 ? true : false;
+
+    const existing = existingData?.find(
+      (item) =>
+        item.fullname === form.fullname &&
+        item.provider === form.provider &&
+        item.cardNumber === form.cardNumber,
+    );
+
+    if (existing) return toast.error("Nomor rekening sudah ditambahkan!");
+
     const newData = {
       id: Date.now(),
-      ...form,
+      fullname: form.fullname,
+      cardNumber: form.cardNumber,
+      type: form.type,
+      balance: form.balance,
+      label: form.label,
+      provider: form.provider,
+      isActive: form.isActive,
+      isDefault,
     };
 
     const addData = [...existingData, newData];
@@ -76,6 +155,8 @@ export default function Rekening() {
       fullname: "",
       cardNumber: 0,
       type: "",
+      balance: 0,
+      label: "",
       provider: "",
       isActive: true,
       isDefault: false,
@@ -94,26 +175,6 @@ export default function Rekening() {
     setData(filtered);
   };
 
-  const providerOptions = {
-    bank: [
-      { value: "BRI", label: "Bank BRI" },
-      { value: "BCA", label: "Bank BCA" },
-      { value: "Jago", label: "Bank Jago" },
-      { value: "Jenius", label: "Bank Jenius" },
-      { value: "Seabank", label: "Seabank" },
-    ],
-    "e-wallet": [
-      { value: "Dana", label: "Dana" },
-      { value: "Ovo", label: "Ovo" },
-      { value: "Gopay", label: "Gopay" },
-      { value: "ShopeePay", label: "ShopeePay" },
-      { value: "LinkAja", label: "LinkAja" },
-    ],
-    debit: [
-      { value: "Visa", label: "Visa" },
-      { value: "Master Card", label: "Master Card" },
-    ],
-  };
   return (
     <main className="relative pb-12.5 w-full z-500 overflow-y-scroll h-screen bg-slate-400 ">
       <header className="sticky top-0 text-white left-0 z-500 mb-10 p-5 w-full h-20 bg-secondary flex items-center justify-center">
@@ -310,7 +371,7 @@ export default function Rekening() {
                     />
                     <div className="flex flex-col">
                       <h1 className="font-bold text-lg capitalize">
-                        {rek.provider} {rek.type}
+                        {rek.label}
                       </h1>
                       <span className="text-md font-medium">
                         {rek.fullname}
@@ -324,11 +385,13 @@ export default function Rekening() {
                 <AccordionDetails>
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox defaultChecked />}
+                      control={<Checkbox checked={rek.isActive} />}
+                      onChange={() => handleChangeActive(rek.id)}
                       label="Aktif"
                     />
                     <FormControlLabel
-                      control={<Checkbox />}
+                      control={<Checkbox checked={rek.isDefault} />}
+                      onChange={() => handleChangeDefault(rek.id)}
                       label="Jadikan sebagai default"
                     />
                   </FormGroup>
