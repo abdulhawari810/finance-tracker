@@ -35,8 +35,8 @@ export default function Rekening() {
   );
   const [form, setForm] = useState({
     fullname: "",
-    cardNumber: 0,
-    balance: 0,
+    cardNumber: "",
+    balance: "",
     type: "",
     label: "",
     provider: "",
@@ -139,9 +139,9 @@ export default function Rekening() {
     const newData = {
       id: Date.now(),
       fullname: form.fullname,
-      cardNumber: form.cardNumber,
+      cardNumber: Number(form.cardNumber),
       type: form.type,
-      balance: form.balance,
+      balance: Number(form.balance),
       label: form.label,
       provider: form.provider,
       isActive: form.isActive,
@@ -338,6 +338,25 @@ export default function Rekening() {
                   className="absolute left-5 px-2 text-lg peer-focus:bg-slate-300 peer-focus:left-2.5 peer-focus:text-xs peer-focus:-translate-y-6.25 peer-not-placeholder-shown:bg-slate-300 peer-not-placeholder-shown:left-2.5 peer-not-placeholder-shown:text-xs peer-not-placeholder-shown:-translate-y-6.25 font-medium!"
                 >
                   Nomor Rekening
+                </label>
+              </div>
+              <div className="flex items-center justify-center relative">
+                <input
+                  type="number"
+                  value={form.balance}
+                  id="balance"
+                  autoComplete="off"
+                  placeholder=" "
+                  onChange={(e) =>
+                    setForm({ ...form, balance: e.target.value })
+                  }
+                  className=" peer text-lg! font-medium! outline-2 outline-primary focus:outline-secondary not-placeholder-shown:outline-secondary rounded-lg w-full h-12 px-5"
+                />
+                <label
+                  htmlFor="balance"
+                  className="absolute left-5 px-2 text-lg peer-focus:bg-slate-300 peer-focus:left-2.5 peer-focus:text-xs peer-focus:-translate-y-6.25 peer-not-placeholder-shown:bg-slate-300 peer-not-placeholder-shown:left-2.5 peer-not-placeholder-shown:text-xs peer-not-placeholder-shown:-translate-y-6.25 font-medium!"
+                >
+                  Saldo Rekening
                 </label>
               </div>
             </AccordionDetails>

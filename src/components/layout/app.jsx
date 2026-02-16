@@ -3,9 +3,11 @@ import Navbar from "../navbar";
 
 export default function App() {
   return (
-    <main className="py-20">
+    <main className="h-screen flex flex-col bg-primary">
       <Navbar navHide={false} />
-      <Outlet />
+      <div className="w-full flex bg-primary flex-col overflow-y-auto pt-20 pb-20">
+        <Outlet />
+      </div>
     </main>
   );
 }
